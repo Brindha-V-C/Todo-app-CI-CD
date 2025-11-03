@@ -10,9 +10,7 @@ pipeline {
         
         stage('Checkout'){
            steps {
-                git credentialsId: ' ', 
-                url: ' ',
-                branch: 'main'
+                git branch: 'main', url: 'https://github.com/Brindha-V-C/Todo-app-CI-CD'
            }
         }
 
@@ -21,7 +19,7 @@ pipeline {
                 script{
                     sh '''
                     echo 'Buid Docker Image'
-                    docker build -t abhishekf5/cicd-e2e:${BUILD_NUMBER} .
+                    docker build -t brindhavc559/my-node-app:${BUILD_NUMBER} .
                     '''
                 }
             }
@@ -32,7 +30,7 @@ pipeline {
                 script{
                     sh '''
                     echo 'Push to Repo'
-                    docker push abhishekf5/cicd-e2e:${BUILD_NUMBER}
+                    docker push brindhavc559/my-node-app:${BUILD_NUMBER}
                     '''
                 }
             }
@@ -40,16 +38,14 @@ pipeline {
         
         stage('Checkout K8S manifest SCM'){
             steps {
-                git credentialsId: ' ', 
-                url: '',
-                branch: 'main'
+                git branch: 'main', url: 'https://github.com/Brindha-V-C/Todo-app-CI-CD/scripts'
             }
         }
         
         stage('Update K8S manifest & push to Repo'){
             steps {
                 script{
-                    withCredentials([usernamePassword(credentialsId: ' ', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'git', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
                         cat deploy.yaml
                         sed -i '' "s/32/${BUILD_NUMBER}/g" deploy.yaml
