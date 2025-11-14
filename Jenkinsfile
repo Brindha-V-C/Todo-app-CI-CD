@@ -39,7 +39,7 @@ pipeline {
         stage('Update Deployment File') {
 
             environment {
-                GIT_REPO_NAME = "springboot-app-cicd"
+                GIT_REPO_NAME = "Todo-app-CI-CD"
                 GIT_USER_NAME = "Brindha-V-C"
             }
 
