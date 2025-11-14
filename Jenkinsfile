@@ -36,28 +36,25 @@ pipeline {
             }
         }
         
-        stage('Checkout K8S manifest SCM'){
-            steps {
-                git branch: 'main', url: 'https://github.com/Brindha-V-C/Todo-app-CI-CD/scripts'
+        stage('Update Deployment File') {
+
+            environment {
+                GIT_REPO_NAME = "springboot-app-cicd"
+                GIT_USER_NAME = "Brindha-V-C"
             }
-        }
-        
-        stage('Update K8S manifest & push to Repo'){
+
             steps {
-                script{
-                    withCredentials([usernamePassword(credentialsId: 'git', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh '''
-                        cat deploy.yaml
-                        sed -i '' "s/32/${BUILD_NUMBER}/g" deploy.yaml
-                        cat deploy.yaml
-                        git add deploy.yaml
-                        git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
-                        git remote -v
-                        git push '' HEAD:main
-                        '''                        
-                    }
+                withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config user.email "brindhavc15@gmail.com"
+                        git config user.name "Brindha V C"
+                        BUILD_NUMBER=${BUILD_NUMBER}
+                        sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deploy/deploy.yaml
+                        git add deploy/deploy.yaml
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
                 }
             }
-        }
     }
 }
